@@ -7,6 +7,9 @@ User= settings.AUTH_USER_MODEL
 class Company(models.Model):
     company_name = models.CharField(max_length=250,blank=False)
 
+    def __str__(self):
+        return self.company_name
+
 class Machines(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -16,3 +19,6 @@ class Machines(models.Model):
     calibrated_date = models.DateField(blank=False)
     certificate_date = models.DateField(blank=False)
     expiry_date = models.DateField(blank=False)
+
+    def __str__(self):
+        return self.nomenclature

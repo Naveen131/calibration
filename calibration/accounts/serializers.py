@@ -25,14 +25,14 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     """
     Currently unused in preference of the below.
     """
-    # email = serializers.EmailField(required=True)
-    # user_name = serializers.CharField(required=True)
-    # password = serializers.CharField(min_length=8, write_only=True)
-    # date_of_birth
+    email = serializers.EmailField(required=True)
+    user_name = serializers.CharField(required=True)
+    password = serializers.CharField(min_length=8, write_only=True)
+    date_of_birth = serializers.DateField(required=True)
 
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ('email','user_name','password','date_of_birth')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
