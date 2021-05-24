@@ -74,10 +74,10 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerilaizer(serializers.ModelSerializer):
-    machines = MachinesSerializer()
+    #machines = MachinesSerializer()
     class Meta:
         model = User
-        fields = ('email','username','date_of_birth')
+        fields = ('id','email','user_name','date_of_birth')
 
 
 class PasswordResetSerializer(serializers.Serializer):

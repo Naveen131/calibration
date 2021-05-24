@@ -14,7 +14,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import RegisterUserSerializer,PasswordResetSerializer,PasswordResetConfirmSerializer
+from .serializers import RegisterUserSerializer,PasswordResetSerializer,PasswordResetConfirmSerializer,UserProfileSerilaizer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import generics, response, status, views
@@ -25,7 +25,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from machines.serializers import MachinesSerializer
 from machines.permissions import IsAdmin
 from machines.models import Machines
-
+from .permissions import AdminOrAuthenticatedUser
 
 class RegisterUser(generics.CreateAPIView):
     serializer_class = RegisterUserSerializer
@@ -104,6 +104,25 @@ class UserProfileAPI(generics.ListAPIView):
         user = self.request.user
         return Machines.objects.filter(user=user)
 
+
+
+class UserListAPIView(generics.ListAPIView):
+    serializer_class = UserProfileSerilaizer
+    authentication_class = JWTAuthentication
+    permission_classes = [IsAdmin]
+    queryset = User.objects.all()
+
+
+class UserDetailAPIView(generics.RetrieveAPIView):
+    serializer_class = UserProfileSerilaizer
+    authentication_class = JWTAuthentication
+    permission_classes = [AdminOrAuthenticatedUser]
+    lookup_field = "id"
+
+
+    def get_queryset(self):
+        pk = self.kwargs["id"]
+        return User.objects.filter(id=pk)
 
 
 
