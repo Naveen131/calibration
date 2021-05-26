@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAdminUser,IsAuthenticated
 from rest_framework.generics import RetrieveAPIView,CreateAPIView,RetrieveUpdateDestroyAPIView,ListAPIView,DestroyAPIView
 from rest_framework import generics,status,views
-from .serializers import MachinesSerializer,CompanySerializer
+from .serializers import MachinesSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from accounts.models import User
 from rest_framework_simplejwt.backends import TokenBackend

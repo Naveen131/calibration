@@ -25,14 +25,15 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     """
     Currently unused in preference of the below.
     """
-    email = serializers.EmailField(required=True)
-    user_name = serializers.CharField(required=True)
-    password = serializers.CharField(min_length=8, write_only=True)
-    date_of_birth = serializers.DateField(required=True)
+    # email = serializers.EmailField(required=True)
+    # user_name = serializers.CharField(required=True)
+    # password = serializers.CharField(min_length=8, write_only=True)
+    # date_of_birth = serializers.DateField(required=True)
+
 
     class Meta:
         model = User
-        fields = ('email','user_name','password','date_of_birth')
+        fields = ('email','user_name','password','date_of_birth','company')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -77,7 +78,7 @@ class UserProfileSerilaizer(serializers.ModelSerializer):
     #machines = MachinesSerializer()
     class Meta:
         model = User
-        fields = ('id','email','user_name','date_of_birth')
+        fields = ('id','email','user_name','date_of_birth','company')
 
 
 class PasswordResetSerializer(serializers.Serializer):

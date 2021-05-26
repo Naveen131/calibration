@@ -1,6 +1,6 @@
 from django.urls import path
 from django.conf.urls import url
-from .views import RegisterUser, BlacklistTokenUpdateView,VerificationView,UserProfileAPI,AdminProfileView,PasswordResetAPIView,PasswordResetConfirmView,UserListAPIView,UserDetailAPIView
+from .views import RegisterUser, BlacklistTokenUpdateView,VerificationView,UserProfileAPI,AdminProfileView,PasswordResetAPIView,PasswordResetConfirmView,UserListAPIView,UserDetailAPIView,ClientView
 app_name = 'users'
 
 urlpatterns = [
@@ -13,5 +13,7 @@ urlpatterns = [
     path('password_reset/',PasswordResetAPIView.as_view(),name='password_change'),
     path('reset/<uidb64>/<token>/',PasswordResetConfirmView.as_view(),name='password_reset_confirm'),
     path('<int:id>/detail/',UserDetailAPIView.as_view(),name='user_detail'),
+    path('<int:id>/client/',ClientView.as_view(),name='client_detail'),
+
     path('list/',UserListAPIView.as_view(),name='users_list')
 ]

@@ -7,7 +7,7 @@ from django.contrib.auth.models import (
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email,user_name, date_of_birth,password=None):
+    def create_user(self, email,user_name,date_of_birth,password=None):
         """
         Creates and saves a User with the given email and password.
         """
@@ -17,6 +17,7 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             user_name=user_name,
+            #company_name=company_name,
             date_of_birth=date_of_birth
         )
 
@@ -32,7 +33,8 @@ class UserManager(BaseUserManager):
             email,
             user_name=user_name,
             date_of_birth=date_of_birth,
-            password=password,
+            password=password
+            #company_name=company_name
         )
         user.staff = True
         user.save(using=self._db)
@@ -46,13 +48,20 @@ class UserManager(BaseUserManager):
             email,
             user_name=user_name,
             password=password,
+            #comapny_name=comapny_name,
             date_of_birth=date_of_birth
+
         )
         user.staff = True
         user.admin = True
         user.save(using=self._db)
         return user
 
+
+class Company(models.Model):
+    company_name = models.CharField(max_length=250,blank=False)
+    def __str__(self):
+        return self.company_name
 
 
 
@@ -62,6 +71,8 @@ class User(AbstractBaseUser,PermissionsMixin):
         max_length=255,
         unique=True,
     )
+
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
 
     user_name = models.CharField(null=False,max_length=255)
     date_of_birth = models.DateField(null=False)
@@ -77,7 +88,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['user_name','date_of_birth'] # Email & Password are required by default.
+    REQUIRED_FIELDS = ['user_name','date_of_birth','company'] # Email & Password are required by default.
 
     def get_full_name(self):
         # The user is identified by their email address

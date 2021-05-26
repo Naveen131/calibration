@@ -158,6 +158,16 @@ class AdminProfileView(generics.ListAPIView,generics.CreateAPIView,generics.Retr
 
 
 
+class ClientView(generics.ListAPIView):
+    serializer_class=UserProfileSerilaizer
+    authentication_class = JWTAuthentication
+    permission_classes = [IsAdmin]
+    lookup_field = "id"
+
+
+    def get_queryset(self):
+        pk = self.kwargs["id"]
+        return User.objects.filter(company=pk)
 
 
 
