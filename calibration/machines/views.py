@@ -15,6 +15,8 @@ from django.core.exceptions import ValidationError
 from rest_framework import permissions
 from .permissions import IsAdmin #IsOwnerOrAdmin
 from .models import Machines
+
+from django.shortcuts import render
 # Create your views here.
 class MachinesCreateView(CreateAPIView):
      serializer_class = MachinesSerializer
@@ -156,5 +158,10 @@ class MachineListApi(ListAPIView):
     def get_queryset(self):
         if self.request.user.is_staff:
             return Machines.objects.all().order_by('-user')
+
+
+
+
+
         else:
             return Machines.objects.filter(user=self.request.user)

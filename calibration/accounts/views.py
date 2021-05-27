@@ -14,18 +14,52 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import RegisterUserSerializer,PasswordResetSerializer,PasswordResetConfirmSerializer,UserProfileSerilaizer
+from .serializers import RegisterUserSerializer,PasswordResetSerializer,PasswordResetConfirmSerializer,UserProfileSerilaizer,CompanySerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import generics, response, status, views
 from .utils import account_activation_token,send_password_reset_email
-from .models import User
+from .models import User,Company
 #from .serializers import UserViewSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from machines.serializers import MachinesSerializer
 from machines.permissions import IsAdmin
 from machines.models import Machines
 from .permissions import AdminOrAuthenticatedUser
+
+
+
+
+
+class CompanyCreateView(generics.CreateAPIView):
+    serializer_class=CompanySerializer
+    permission_classes=[IsAdmin]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            return self.is_valid(serializer)
+        return self.is_invalid(serializer)
+
+
+    def is_invalid(self, serializer):
+        return response.Response(
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    def is_valid(self, serializer):
+        user = serializer.save()
+        return response.Response(
+            data={'data': 'ok_message'},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+
+
+
+
 
 class RegisterUser(generics.CreateAPIView):
     serializer_class = RegisterUserSerializer
@@ -46,15 +80,6 @@ class RegisterUser(generics.CreateAPIView):
 
     def is_valid(self, serializer):
         user = serializer.save()
-        # if not user.is_active:
-        #     user.send_validation_email()
-        #     ok_message = _(
-        #         'Your account has been created and an activation link sent ' +
-        #         'to your email address. Please check your email to continue.'
-        #     )
-        # else:
-        #     ok_message = _('Your account has been created.')
-        #
         return response.Response(
             data={'data': 'ok_message'},
             status=status.HTTP_201_CREATED,
@@ -169,6 +194,12 @@ class ClientView(generics.ListAPIView):
         pk = self.kwargs["id"]
         return User.objects.filter(company=pk)
 
+
+class ClientListView(generics.ListAPIView):
+    serializer_class=CompanySerializer
+    authentication_class=JWTAuthentication
+    permission_classes=[IsAdmin]
+    queryset=Company.objects.all()
 
 
 class PasswordResetAPIView(views.APIView):

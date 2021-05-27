@@ -10,6 +10,8 @@ from django.contrib.auth.tokens import default_token_generator
 from .utils import account_activation_token
 from django.urls import reverse
 from machines.serializers import MachinesSerializer
+from .models import Company
+
 
 
 def generate_activation_key():
@@ -18,7 +20,10 @@ def generate_activation_key():
     return hashlib.sha256((secret_key).encode('utf-8')).hexdigest()
 
 
-
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = '__all__'
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
