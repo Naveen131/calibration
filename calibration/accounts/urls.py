@@ -1,6 +1,10 @@
 from django.urls import path
 from django.conf.urls import url
-from .views import RegisterUser, BlacklistTokenUpdateView,VerificationView,UserProfileAPI,AdminProfileView,PasswordResetAPIView,PasswordResetConfirmView,UserListAPIView,UserDetailAPIView,ClientView,CompanyCreateView,ClientListView
+from .views import (
+RegisterUser, BlacklistTokenUpdateView,VerificationView,
+UserProfileAPI,AdminProfileView,PasswordResetAPIView,PasswordResetConfirmView,
+UserListAPIView,UserDetailAPIView,ClientView,CompanyCreateView,ClientListView,UserDetailedAPIView,UserMachineList
+)
 app_name = 'users'
 
 urlpatterns = [
@@ -12,10 +16,10 @@ urlpatterns = [
     path('activate/<uidb64>/<token>',VerificationView.as_view(), name='activate'),
     path('password_reset/',PasswordResetAPIView.as_view(),name='password_change'),
     path('reset/<uidb64>/<token>/',PasswordResetConfirmView.as_view(),name='password_reset_confirm'),
-    path('<int:id>/detail/',UserDetailAPIView.as_view(),name='user_detail'),
-    path('<int:id>/client/',ClientView.as_view(),name='client_detail'),
+    path('<uuid:id>/detail/',UserDetailAPIView.as_view(),name='user_detail'),
+    path('detail/',UserDetailedAPIView.as_view(),name='user_detail'),
+    path('<str:company>/client/',ClientView.as_view(),name='client_detail'),
     path('client/',ClientListView.as_view(),name='company_list'),
-
-
-    path('list/',UserListAPIView.as_view(),name='users_list')
+    path('list/',UserListAPIView.as_view(),name='users_list'),
+    path('<uuid:id>/machines/',UserMachineList.as_view(),name='user_machines_list')
 ]

@@ -2,12 +2,12 @@ from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser,PermissionsMixin
 )
-
+import uuid
 
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email,user_name,date_of_birth,password=None):
+    def create_user(self, email,user_name,password=None,company=None):
         """
         Creates and saves a User with the given email and password.
         """
@@ -17,30 +17,30 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             user_name=user_name,
-            #company_name=company_name,
-            date_of_birth=date_of_birth
+            company=company
+            #date_of_birth=date_of_birth
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_staffuser(self, email,user_name,date_of_birth, password):
+    def create_staffuser(self, email,user_name,password,company=None):
         """
         Creates and saves a staff user with the given email and password.
         """
         user = self.create_user(
             email,
             user_name=user_name,
-            date_of_birth=date_of_birth,
-            password=password
-            #company_name=company_name
+            #date_of_birth=date_of_birth,
+            password=password,
+            company=company
         )
         user.staff = True
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email,user_name,date_of_birth ,password):
+    def create_superuser(self, email,user_name,password,company=None):
         """
         Creates and saves a superuser with the given email and password.
         """
@@ -48,8 +48,8 @@ class UserManager(BaseUserManager):
             email,
             user_name=user_name,
             password=password,
-            #comapny_name=comapny_name,
-            date_of_birth=date_of_birth
+            company=company
+            #date_of_birth=date_of_birth
 
         )
         user.staff = True
@@ -59,23 +59,29 @@ class UserManager(BaseUserManager):
 
 
 class Company(models.Model):
-    company_name = models.CharField(max_length=250,blank=False)
+
+    #id = models.AutoField()
+    company_name = models.CharField(max_length=250,blank=False,primary_key=True)
     def __str__(self):
         return self.company_name
 
 
 
 class User(AbstractBaseUser,PermissionsMixin):
+    id = models.UUIDField(
+         primary_key = False,
+         default = uuid.uuid4,
+         editable = False)
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
-        unique=True,
+        primary_key=True,
     )
 
     company = models.ForeignKey(Company,on_delete=models.CASCADE)
 
     user_name = models.CharField(null=False,max_length=255)
-    date_of_birth = models.DateField(null=False)
+    #date_of_birth = models.DateField(null=False)
     is_active = models.BooleanField(default=True)
     staff = models.BooleanField(default=False) # a admin user; non super-user
     admin = models.BooleanField(default=False) # a superuser
@@ -88,7 +94,10 @@ class User(AbstractBaseUser,PermissionsMixin):
 
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['user_name','date_of_birth','company'] # Email & Password are required by default.
+    REQUIRED_FIELDS = ['user_name','company'] # Email & Password are required by default.
+
+    def __str__(self):
+        self.email
 
     def get_full_name(self):
         # The user is identified by their email address

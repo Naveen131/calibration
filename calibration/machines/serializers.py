@@ -3,7 +3,9 @@ from .models import Machines
 
 
 class MachinesSerializer(serializers.ModelSerializer):
-    # company = serializers.RelatedField()
+    # company = serializers.StringRelatedField()
+    #user = serializers.StringRelatedField()
+
     class Meta:
         model = Machines
-        fields = ('id','user','nomenclature','certificate_number' , 'calibrated_date','certificate_date','expiry_date')
+        fields = ('id','user','company','nomenclature','certificate_number' , 'calibrated_date','certificate_date','expiry_date')

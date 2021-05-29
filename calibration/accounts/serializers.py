@@ -11,6 +11,7 @@ from .utils import account_activation_token
 from django.urls import reverse
 from machines.serializers import MachinesSerializer
 from .models import Company
+from machines.models import Machines
 
 
 
@@ -30,16 +31,24 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     """
     Currently unused in preference of the below.
     """
-    # email = serializers.EmailField(required=True)
-    # user_name = serializers.CharField(required=True)
-    # password = serializers.CharField(min_length=8, write_only=True)
-    # date_of_birth = serializers.DateField(required=True)
+    #email = serializers.StringRelatedField()
+    #company = serializers.StringRelatedField()
+    #user_name = serializers.CharField(required=True)
+    #password = serializers.CharField(min_length=8, write_only=True)
+    #date_of_birth = serializers.DateField(required=True)
 
 
     class Meta:
         model = User
-        fields = ('email','user_name','password','date_of_birth','company')
+        #fields = '__all__'#['email','user_name','password','company']
+        exclude = ['groups','user_permissions']
         extra_kwargs = {'password': {'write_only': True}}
+
+        # def to_representation(self, instance):
+        #     rep = super(RegisterUserSerializer).to_representation(instance)
+        #     print(instance.company.company_name)
+        #     rep["company"] = instance.company.company_name
+        #     return rep
 
     def create(self, validated_data):
         password = validated_data.pop('password', None)
@@ -78,12 +87,19 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 #         model = User
 #         fields = ['username','machines']
 
+class UserViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','user_name','company')
+
 
 class UserProfileSerilaizer(serializers.ModelSerializer):
     #machines = MachinesSerializer()
+    #company = serializers.StringRelatedField()
+
     class Meta:
         model = User
-        fields = ('id','email','user_name','date_of_birth','company')
+        fields = ('id','email','user_name','company')
 
 
 class PasswordResetSerializer(serializers.Serializer):
@@ -141,3 +157,11 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if not self.valid_attempt:
             raise serializers.ValidationError("Operation not allowed.")
         return data
+
+
+
+class UserMachineListSerializer(serializers.ModelSerializer):
+    users = MachinesSerializer(many=True,read_only=True)
+    class Meta:
+        model = User
+        fields = ('id', 'users')

@@ -75,37 +75,51 @@ class MachinesRetrieveAPIView(generics.RetrieveAPIView):
     #    return Response(serializer.data)
 
 
-class MachinesUpdateAPIView(APIView):
+class MachinesUpdateAPIView(generics.UpdateAPIView):
     serializer_class = MachinesSerializer
     authentication_class = JWTAuthentication
     permission_classes =  [IsAdmin]
     #allowed_methods =['put','patch']
+    lookup_field='id'
+    queryset = Machines.objects.all()
 
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
 
-
-    def get_queryset(self):
-        return Machines.objects.all()
-
-    def get_object(self,pk):
-        return Machines.objects.get(id=pk)
-
-    def put(self,request,*args,**kwargs):
-        id = self.request.data['id']
-        obj = self.get_object(id)
-        serializer = MachinesSerializer(obj,data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
-            status_code = status.HTTP_201_CREATED
+            return Response({"message": "updated successfully","details":serializer.data})
 
-            response = {
-                   'success' :'True',
-                   'status_code':status_code,
-                   'message' :"machine added successfully"
-            }
-            return Response(response)
-        return Response({'status_code':status.HTTP_400_BAD_REQUEST,'message':"wrong parameter"})
+        else:
+            return Response({"message": "failed", "details": serializer.errors})
 
+
+
+
+    # def get_queryset(self):
+    #     return Machines.objects.all()
+    #
+    # def get_object(self,pk):
+    #     return Machines.objects.get(id=pk)
+    #
+    # def put(self,request,*args,**kwargs):
+    #     id = self.request.data['id']
+    #     obj = self.get_object(id)
+    #     serializer = MachinesSerializer(obj,data=request.data,partial=True)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         status_code = status.HTTP_201_CREATED
+    #
+    #         response = {
+    #                'success' :'True',
+    #                'status_code':status_code,
+    #                'message' :"machine added successfully"
+    #         }
+    #         return Response(response)
+    #     return Response({'status_code':status.HTTP_400_BAD_REQUEST,'message':"wrong parameter"})
+    #
 
 class MachineDeleteView(generics.DestroyAPIView):
     serializer_class = MachinesSerializer

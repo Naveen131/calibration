@@ -14,7 +14,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import RegisterUserSerializer,PasswordResetSerializer,PasswordResetConfirmSerializer,UserProfileSerilaizer,CompanySerializer
+from .serializers import (
+RegisterUserSerializer,PasswordResetSerializer,PasswordResetConfirmSerializer,
+UserProfileSerilaizer,CompanySerializer,UserViewSerializer,UserMachineListSerializer
+)
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import generics, response, status, views
@@ -26,7 +29,8 @@ from machines.serializers import MachinesSerializer
 from machines.permissions import IsAdmin
 from machines.models import Machines
 from .permissions import AdminOrAuthenticatedUser
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 
@@ -121,6 +125,31 @@ class BlacklistTokenUpdateView(APIView):
 #         queryset=User.objects.get(pk=3)
 #
 
+
+
+class UserUpdateAPIView(generics.UpdateAPIView):
+    serializer_class = User
+    authentication_class = JWTAuthentication
+    permission_classes =  [IsAdmin]
+    #allowed_methods =['put','patch']
+    lookup_field='id'
+    queryset = Machines.objects.all()
+
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "updated successfully","details":serializer.data})
+
+        else:
+            return Response({"message": "failed", "details": serializer.errors})
+
+
+
+
 class UserProfileAPI(generics.ListAPIView):
     serializer_class = MachinesSerializer
     authentication_class = JWTAuthentication
@@ -139,16 +168,29 @@ class UserListAPIView(generics.ListAPIView):
 
 
 class UserDetailAPIView(generics.RetrieveAPIView):
-    serializer_class = UserProfileSerilaizer
+    serializer_class = UserViewSerializer
     authentication_class = JWTAuthentication
-    permission_classes = [AdminOrAuthenticatedUser]
+    permission_classes = [IsAdmin]
     lookup_field = "id"
 
 
-    def get_queryset(self):
-        pk = self.kwargs["id"]
-        return User.objects.filter(id=pk)
+    # def get_object(self):
+    #     return self.request.user
 
+    def get_queryset(self):
+        id = self.kwargs["id"]
+        return User.objects.filter(id=id)
+
+
+class UserDetailedAPIView(generics.RetrieveAPIView):
+    serializer_class = UserViewSerializer
+    authentication_class = JWTAuthentication
+    permission_classes = [IsAuthenticated]
+    #lookup_field = "id"
+
+
+    def get_object(self):
+        return self.request.user
 
 
 
@@ -187,11 +229,11 @@ class ClientView(generics.ListAPIView):
     serializer_class=UserProfileSerilaizer
     authentication_class = JWTAuthentication
     permission_classes = [IsAdmin]
-    lookup_field = "id"
+    lookup_field = "company"
 
 
     def get_queryset(self):
-        pk = self.kwargs["id"]
+        pk = self.kwargs["company"]
         return User.objects.filter(company=pk)
 
 
@@ -214,6 +256,19 @@ class PasswordResetAPIView(views.APIView):
             send_password_reset_email(user,site='http://127.0.0.1:8000')
             return Response(status=status.HTTP_200_OK)
         return Response(status=statu.HTTP_200_OK)
+
+
+
+class UserMachineList(generics.RetrieveAPIView):
+    serializer_class = UserMachineListSerializer
+    authentication_class=JWTAuthentication
+    permission_classes=[IsAdmin]
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        return User.objects.filter(id=id)
+
 
 
 class PasswordResetConfirmView(views.APIView):
@@ -239,6 +294,18 @@ class PasswordResetConfirmView(views.APIView):
 
 
 
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['id'] = str(user.id)
+        return token
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 
 class VerificationView(APIView):
