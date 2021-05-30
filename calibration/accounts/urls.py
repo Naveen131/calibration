@@ -11,9 +11,9 @@ app_name = 'users'
 urlpatterns = [
 
     path('company/create/',CompanyCreateView.as_view(),name="company_create"),
-    path('<str:company_name>/company/detail/',CompanyDetail.as_view(),name='company_detail'),
-    path('<str:company_name>/company/update/',CompanyUpdate.as_view(),name='company_update'),
-    path('<str:company_name>/company/delete/',CompanyDelete.as_view(),name='company_delete'),
+    path('<str:company_name>/detail/',CompanyDetail.as_view(),name='company_detail'),
+    path('<str:company_name>/update/',CompanyUpdate.as_view(),name='company_update'),
+    path('<str:company_name>/delete/',CompanyDelete.as_view(),name='company_delete'),
     path('<str:company>/client/',ClientView.as_view(),name='client_detail'),
     path('client/',ClientListView.as_view(),name='company_list'),
     path('list/',UserListAPIView.as_view(),name='users_list'),
@@ -27,7 +27,7 @@ urlpatterns = [
     path('detail/',UserDetailedAPIView.as_view(),name='user_detail'),
     path('dashboard/',UserProfileAPI.as_view(),name="dashboard"),
     url('dashboard-admin/',AdminProfileView.as_view(),name="dashboard-admin"),
-    path('<uuid:id>/user/update/',UserUpdateAPIView.as_view(),name="user_update"),
+    path('<uuid:id>/',UserUpdateAPIView.as_view(),name="user_update"),
 
 
 
