@@ -61,18 +61,6 @@ class MachinesRetrieveAPIView(generics.RetrieveAPIView):
     permission_classes =  [IsAuthenticated]
     queryset = Machines.objects.all()
 
-    # def get_object(self,pk):
-    #     (self.request.id)
-    #     return Response(Machines.objects.get(id=pk))
-    #
-    #
-    # def retrieve(self, request, *args, **kwargs):
-    #    print(request.id)
-    #
-    #
-    #    instance = self.get_object(pk) # here the object is retrieved
-    #    serializer = self.get_serializer(instance)
-    #    return Response(serializer.data)
 
 
 class MachinesUpdateAPIView(generics.UpdateAPIView):
@@ -98,28 +86,7 @@ class MachinesUpdateAPIView(generics.UpdateAPIView):
 
 
 
-    # def get_queryset(self):
-    #     return Machines.objects.all()
-    #
-    # def get_object(self,pk):
-    #     return Machines.objects.get(id=pk)
-    #
-    # def put(self,request,*args,**kwargs):
-    #     id = self.request.data['id']
-    #     obj = self.get_object(id)
-    #     serializer = MachinesSerializer(obj,data=request.data,partial=True)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         status_code = status.HTTP_201_CREATED
-    #
-    #         response = {
-    #                'success' :'True',
-    #                'status_code':status_code,
-    #                'message' :"machine added successfully"
-    #         }
-    #         return Response(response)
-    #     return Response({'status_code':status.HTTP_400_BAD_REQUEST,'message':"wrong parameter"})
-    #
+
 
 class MachineDeleteView(generics.DestroyAPIView):
     serializer_class = MachinesSerializer
@@ -129,53 +96,15 @@ class MachineDeleteView(generics.DestroyAPIView):
     queryset = Machines.objects.all()
 
 
-    # def get_queryset(self):
-    #     return Machines.objects.all()
-    #
-    # def get_object(self,pk):
-    #     return Machines.objects.get(id=pk)
-    #
-    # def delete(self,request,id):
-    #     id = self.request.query_params.get('id')
-    #     print(id)
-    #     #obj = self.get_object(self.request.data['id'])
-    #     obj.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
-
-    # def delete(self,request,*args,**kwargs):
-    #     id = self.request.data['id']
-    #     print(self.request.data)
-    #     obj = self.get_object(id)
-    #     serializer = MachinesSerializer(obj,data=request.data,partial=True)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         status_code = status.HTTP_201_CREATED
-    #
-    #         response = {
-    #                'success' :'True',
-    #                'status_code':status_code,
-    #                'message' :"machine added successfully"
-    #         }
-    #         return Response(response)
-    #     return Response({'status_code':status.HTTP_400_BAD_REQUEST,'message':"wrong parameter"})
-
 
 class MachineListApi(ListAPIView):
     serializer_class = MachinesSerializer
     authentication_class = JWTAuthentication
     permission_classes =  [IsAuthenticated]
 
-    # def get(self,request):
-    #     print(self.request.data)
-    #     return Response(Machines.objects.all())
 
     def get_queryset(self):
         if self.request.user.is_staff:
             return Machines.objects.all().order_by('-user')
-
-
-
-
-
         else:
             return Machines.objects.filter(user=self.request.user)

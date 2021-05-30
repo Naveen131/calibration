@@ -62,6 +62,47 @@ class CompanyCreateView(generics.CreateAPIView):
 
 
 
+class CompanyDetail(generics.RetrieveAPIView):
+    serializer_class=CompanySerializer
+    permission_classes=[IsAdmin]
+    authentication_class=JWTAuthentication
+    lookup_field='company_name'
+
+    def get_queryset(self):
+        name = self.kwargs['company_name']
+        return Company.objects.filter(company_name=name)
+
+
+
+
+class CompanyUpdate(generics.UpdateAPIView):
+    serializer_class=CompanySerializer
+    permission_classes=[IsAdmin]
+    authentication_class=JWTAuthentication
+    lookup_field='company_name'
+    queryset = Company.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "updated successfully","details":serializer.data})
+
+        else:
+            return Response({"message": "failed", "details": serializer.errors})
+
+
+class CompanyDelete(generics.DestroyAPIView):
+    serializer_class = CompanySerializer
+    authentication_class = JWTAuthentication
+    permission_classes =  [IsAdmin]
+    lookup_field = 'company_name'
+
+    def get_queryset(self):
+        name = self.kwargs['company_name']
+        return Company.objects.filter(company_name=name)
 
 
 
@@ -105,47 +146,35 @@ class BlacklistTokenUpdateView(APIView):
 
 
 
-# @api_view(('GET',))
-# def activate(request,token):
-#     if user is not None and default_token_generator.check_token(user, token):
-#         user.is_active = True
-#         user.save()
-#         return Response('Thank you for your email confirmation. Now you can login your account.')
-#     else:
-#         return Response('Activation link is invalid!')
 
 
-# class UserViewApi(generics.RetrieveAPIView):
-#     serializer_class = UserViewSerializer()
-#     permission_classes = [IsAuthenticated]
-#     authentication_classes = [JWTTokenUserAuthentication]
-#
-#     def get_queryset(self):
-#         print(self.request)
-#         queryset=User.objects.get(pk=3)
-#
-
-
-
-class UserUpdateAPIView(generics.UpdateAPIView):
-    serializer_class = User
+class UserUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserProfileSerilaizer
     authentication_class = JWTAuthentication
     permission_classes =  [IsAdmin]
     #allowed_methods =['put','patch']
     lookup_field='id'
-    queryset = Machines.objects.all()
 
+    def get_queryset(self):
+        id = self.kwargs['id']
+        return User.objects.filter(id=id)
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "updated successfully","details":serializer.data})
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
-        else:
-            return Response({"message": "failed", "details": serializer.errors})
+    # def update(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance, data=request.data, partial=True)
+    #
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response({"message": "updated successfully","details":serializer.data})
+    #
+    #     else:
+    #         return Response({"message": "failed", "details": serializer.errors})
 
 
 
